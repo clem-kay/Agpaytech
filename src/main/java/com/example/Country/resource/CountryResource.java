@@ -21,7 +21,7 @@ public class CountryResource {
     private final CountryServiceImpl countryService;
 
     @GetMapping("/list/{pageNo}/{size}")
-    public ResponseEntity<Response> getServers(@PathVariable int pageNo, @PathVariable int size) {
+    public ResponseEntity<Response> getCountries(@PathVariable("pageNo") int pageNo, @PathVariable("size") int size) {
         return ResponseEntity.ok(Response.builder()
                 .timeStamp(now())
                 .data(of("countries", countryService.list(pageNo, size)))
@@ -45,18 +45,6 @@ public class CountryResource {
         );
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Response> getServer(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(Response.builder()
-                .timeStamp(now())
-                .data(of("country", countryService.get(id)))
-                .message("country retrieved")
-                .status(OK)
-                .statusCode(OK.value())
-                .build()
-        );
-    }
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Response> deleteServer(@PathVariable("id") Long id) {
         return ResponseEntity.ok(Response.builder()
@@ -67,5 +55,16 @@ public class CountryResource {
                 .statusCode(OK.value())
                 .build()
         );
+    }
+    @GetMapping("/search/{name}")
+    public ResponseEntity<Response> searchByName(@PathVariable("name") String name){
+        return ResponseEntity.ok(Response.builder()
+                .timeStamp(now())
+                .data(of("countries", countryService.search(name)))
+                .message("Country found")
+                .status(OK)
+                .statusCode(OK.value()).build()
+        );
+
     }
 }

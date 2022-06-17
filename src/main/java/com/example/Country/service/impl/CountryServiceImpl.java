@@ -44,6 +44,12 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
+    public List<Country> search(String name) {
+        log.info("Getting country by serach {}",name);
+        return countryRepository.searchByName(name);
+    }
+
+    @Override
     public Country get(Long id) {
         log.info("Getting country by id {}", id);
         return countryRepository.findById(id).get();

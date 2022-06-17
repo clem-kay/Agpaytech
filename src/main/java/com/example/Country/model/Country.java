@@ -6,7 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
 @Data
-@Entity
+@Entity(name = "country")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Country {
