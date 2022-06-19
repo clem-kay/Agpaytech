@@ -17,7 +17,7 @@ public class Response {
     protected LocalDateTime timeStamp;
     protected int statusCode;
     protected HttpStatus status;
-    protected String reason;
+    protected String error;
     protected String message;
     protected String developerMessage;
     protected Map<?, ?> data;

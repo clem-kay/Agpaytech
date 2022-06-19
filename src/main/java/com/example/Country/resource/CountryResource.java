@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.util.Objects;
+
 import static java.time.LocalDateTime.now;
 import static java.util.Map.of;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/country")
@@ -34,15 +35,29 @@ public class CountryResource {
 
     @PostMapping("/save")
     public ResponseEntity<Response> saveCountry(@RequestBody @Valid Country country) {
+        if (country.getName() == null) {
+            return ResponseEntity.ok(Response.builder()
+                    .timeStamp(now())
+                    .message("Name of country cannot be null")
+                    .status(BAD_REQUEST)
+                    .statusCode(BAD_REQUEST.value())
+                    .error("Empty Country")
+                    .build()
+            );
 
-        return ResponseEntity.ok(Response.builder()
-                .timeStamp(now())
-                .data(of("country", countryService.create(country)))
-                .message("New country created")
-                .status(CREATED)
-                .statusCode(CREATED.value())
-                .build()
-        );
+        } else {
+            Country savedCountry = countryService.create(country);
+            return ResponseEntity.ok(Response.builder()
+                    .timeStamp(now())
+                    .data(of("country", savedCountry == null ? "" : savedCountry))
+                    .message(savedCountry == null ? "Duplicate Name found" : "New country created")
+                    .status(savedCountry == null ? BAD_REQUEST : CREATED)
+                    .statusCode(savedCountry == null ? BAD_REQUEST.value() : CREATED.value())
+                    .error("")
+                    .build()
+            );
+        }
+
     }
 
     @DeleteMapping("/delete/{id}")
@@ -56,15 +71,66 @@ public class CountryResource {
                 .build()
         );
     }
-    @GetMapping("/search/{name}")
-    public ResponseEntity<Response> searchByName(@PathVariable("name") String name){
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Response> getOne(@PathVariable("id") Long id) {
+        Country foundCountry = countryService.get(id);
         return ResponseEntity.ok(Response.builder()
                 .timeStamp(now())
-                .data(of("countries", countryService.search(name)))
-                .message("Country found")
-                .status(OK)
-                .statusCode(OK.value()).build()
+                .data(of("country", foundCountry == null ? "" : foundCountry))
+                .message(foundCountry == null ? "No country found" : "country found")
+                .status(foundCountry == null ? BAD_REQUEST : CREATED)
+                .statusCode(foundCountry == null ? BAD_REQUEST.value() : CREATED.value())
+                .error("")
+                .build()
         );
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Response> updateCountry(@RequestBody @Valid Country country) {
+        if (Objects.isNull(country)) {
+            return ResponseEntity.ok(Response.builder()
+                    .timeStamp(now())
+                    .message("Empty country cannot be parsed")
+                    .status(BAD_REQUEST)
+                    .statusCode(BAD_REQUEST.value())
+                    .error("Empty Country")
+                    .build()
+            );
+
+        } else {
+            return ResponseEntity.ok(Response.builder()
+                    .timeStamp(now())
+                    .data(of("country", countryService.update(country)))
+                    .message(country.getName() + " updated")
+                    .status(OK)
+                    .statusCode(OK.value())
+                    .build()
+            );
+        }
+
+    }
+
+    @GetMapping("/search/{name}")
+    public ResponseEntity<Response> searchByName(@PathVariable("name") String name) {
+        if (name != null) {
+            return ResponseEntity.ok(Response.builder()
+                    .timeStamp(now())
+                    .data(of("countries", countryService.search(name)))
+                    .message("Country found")
+                    .status(OK)
+                    .statusCode(OK.value()).build()
+            );
+        } else {
+            return ResponseEntity.ok(Response.builder()
+                    .timeStamp(now())
+                    .message("Empty Name")
+                    .status(BAD_REQUEST)
+                    .statusCode(BAD_REQUEST.value())
+                    .error("Empty Name")
+                    .build()
+            );
+        }
 
     }
 }

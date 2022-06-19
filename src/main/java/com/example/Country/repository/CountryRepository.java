@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface CountryRepository extends JpaRepository<Country, Long> {
     Optional<Country> findCountryByName(String name);
-    @Query("SELECT 'name' from country WHERE name LIKE CONCAT('%',:query,'%')")
-    List<Country> searchByName(String query);
+    //@Query(value ="SELECT '*' FROM country WHERE name LIKE CONCAT('%',:searchName,'%')")
+    List<Country> searchByNameContaining(String searchName);
 
 }
